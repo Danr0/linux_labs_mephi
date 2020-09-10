@@ -1,0 +1,61 @@
+.:
+total 4
+drw-rw-rw- 2 test test 60 Sep 10 21:16 dir
+-rw-rw---- 1 root test  5 Sep 10 21:13 file
+-rw------- 1 test test  0 Sep 10 21:29 file1
+-rw-rw-rw- 1 test test  0 Sep 10 21:29 file2
+
+./dir:
+total 4
+-rw-r--r-- 1 test test 7 Sep 10 21:16 new_file
+    1  id
+    2  history > lab1_history.txt
+    3  ls
+    4  cat lab1_history.txt 
+    5  exit
+    6  ls
+    7  cd test
+    8  cd /tmp/test/
+    9  ls -l
+   10  chown root file
+   11  chmod 600 file
+   12  ls -l
+   13  chgrp test file
+   14  chmod 660 file
+   15  ls -lR > ~/lab2.txt
+   16  history >> ~/lab2.txt 
+    1  cd
+    2  mkdir test && cd test
+    3  touch file
+    4  ls -la
+    5  chmod 000 file 
+    6  echo "test" > file 
+    7  cat file 
+    8  chmod 200 file 
+    9  ls -la
+   10  echo "test" > file 
+   11  cat file 
+   12  chmod 240 file 
+   13  ls -la
+   14  cat file 
+   15  chmod 640 file 
+   16  ls -la
+   17  cat file 
+   18  mkdir dir && cd dir && echo "file 2" > new_file
+   19  ls
+   20  cd ..
+   21  ls -la
+   22  chmod 666 dir
+   23  cat dir/new_file 
+   24  chown root dir/new_file 
+   25  chgrp root dir/new_file 
+   26  umask 177
+   27  touch file1
+   28  ls -l
+   29  umask 111
+   30  touch file2
+   31  ls -l
+   32  cat file
+   33  cat file
+   34  cat file
+   35  history >> /root/lab2.txt 
