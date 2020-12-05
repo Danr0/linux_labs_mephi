@@ -1,0 +1,173 @@
+root@parrot-virtual:~/lab6# ls -l /dev/sda{,[123]}
+brw-rw---- 1 root disk 8, 0 Sep  9 21:40 /dev/sda
+brw-rw---- 1 root disk 8, 1 Sep  9 21:40 /dev/sda1
+root@parrot-virtual:~/lab6# lsblk --list
+NAME MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda    8:0    0   80G  0 disk			 
+sda1   8:1    0   80G  0 part /home
+sr0   11:0    1 1024M  0 rom  
+root@parrot-virtual:~/lab6# cat /proc/diskstats 
+  11       0 sr0 10 0 4 1 0 0 0 0 0 17 1 0 0 0 0 0 0
+   8       0 sda 33648 10919 3349226 19142 212979 51255 14799696 34786 0 107374 81484 40032 0 180095496 23891 105924 3665
+   8       1 sda1 33530 10919 3344001 19083 160017 51255 14799696 32659 0 107277 75634 40032 0 180095496 23891 0 0
+ 253       0 pktcdvd0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       0 loop0 5 0 16 0 0 0 0 0 0 10 0 0 0 0 0 0 0
+   7       1 loop1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       2 loop2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       3 loop3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       4 loop4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       5 loop5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       6 loop6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+   7       7 loop7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+# Maj:Min 
+# 8:0
+# 8:1
+
+
+
+root@parrot-virtual:~/lab6# cat /proc/devices 
+Character devices:
+  1 mem
+  4 /dev/vc/0
+  4 tty
+  4 ttyS
+  5 /dev/tty
+  5 /dev/console
+  5 /dev/ptmx
+  6 lp
+  7 vcs
+ 10 misc
+ 13 input
+ 21 sg
+ 29 fb
+ 99 ppdev
+116 alsa
+128 ptm
+136 pts
+153 spi
+180 usb
+189 usb_device
+226 drm
+248 hidraw
+249 aux
+250 cec
+251 bsg
+252 rtc
+253 dax
+254 gpiochip
+
+Block devices:
+  7 loop
+  8 sd
+  9 md
+ 11 sr
+ 65 sd
+ 66 sd
+ 67 sd
+ 68 sd
+ 69 sd
+ 70 sd
+ 71 sd
+128 sd
+129 sd
+130 sd
+131 sd
+132 sd
+133 sd
+134 sd
+135 sd
+253 pktcdvd
+254 mdp
+259 blkext
+# 8
+
+
+
+
+
+root@parrot-virtual:~/lab6# dd if=/dev/zero of=./fs.img bs=1M count=10
+10+0 records in
+10+0 records out
+10485760 bytes (10 MB, 10 MiB) copied, 0.00366433 s, 2.9 GB/s
+root@parrot-virtual:~/lab6# losetup --find --show ./fs.img
+/dev/loop0
+root@parrot-virtual:~/lab6# ls
+fs.img
+root@parrot-virtual:~/lab6# losetup --list
+NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE         DIO LOG-SEC
+/dev/loop0         0      0         0  0 /root/lab6/fs.img   0     512
+root@parrot-virtual:~/lab6# mkfs -t ext4 /dev/loop0
+mke2fs 1.45.6 (20-Mar-2020)
+Discarding device blocks: done                            
+Creating filesystem with 10240 1k blocks and 2560 inodes
+Filesystem UUID: 90dc5456-ec4f-4a5d-8c5b-97c48ea3c39b
+Superblock backups stored on blocks: 
+	8193
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (1024 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+root@parrot-virtual:~/lab6# blkid /dev/loop0
+/dev/loop0: UUID="90dc5456-ec4f-4a5d-8c5b-97c48ea3c39b" BLOCK_SIZE="1024" TYPE="ext4"
+root@parrot-virtual:~/lab6# mount /dev/loop0 /mnt
+root@parrot-virtual:~/lab6# mount | grep /mnt
+/dev/loop0 on /mnt type ext4 (rw,relatime)
+root@parrot-virtual:~/lab6# df -h /mnt
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/loop0      8.7M  172K  7.9M   3% /mnt
+root@parrot-virtual:~/lab6# df -hi /mnt
+Filesystem     Inodes IUsed IFree IUse% Mounted on
+/dev/loop0       2.5K    11  2.5K    1% /mnt
+root@parrot-virtual:~/lab6# umount /dev/loop0
+root@parrot-virtual:~/lab6# tune2fs -l /dev/loop0
+tune2fs 1.45.6 (20-Mar-2020)
+Filesystem volume name:   <none>
+Last mounted on:          <not available>
+Filesystem UUID:          90dc5456-ec4f-4a5d-8c5b-97c48ea3c39b
+Filesystem magic number:  0xEF53
+Filesystem revision #:    1 (dynamic)
+Filesystem features:      has_journal ext_attr resize_inode dir_index filetype extent 64bit flex_bg sparse_super large_file huge_file dir_nlink extra_isize metadata_csum
+Filesystem flags:         signed_directory_hash 
+Default mount options:    user_xattr acl
+Filesystem state:         clean
+Errors behavior:          Continue
+Filesystem OS type:       Linux
+Inode count:              2560
+Block count:              10240
+Reserved block count:     512
+Free blocks:              8715			# Free blocks
+Free inodes:              2549			# Free inodes
+First block:              1
+Block size:               1024
+Fragment size:            1024
+Group descriptor size:    64
+Reserved GDT blocks:      79
+Blocks per group:         8192
+Fragments per group:      8192
+Inodes per group:         1280
+Inode blocks per group:   160
+Flex block group size:    16
+Filesystem created:       Fri Dec  4 20:08:06 2020	# Time of mount = last time - created = about 2 min
+Last mount time:          Fri Dec  4 20:10:30 2020	# Last mount time
+Last write time:          Sat Dec  5 16:24:35 2020
+Mount count:              1			# Mount count
+Maximum mount count:      -1
+Last checked:             Fri Dec  4 20:08:06 2020
+Check interval:           0 (<none>)
+Lifetime writes:          426 kB
+Reserved blocks uid:      0 (user root)
+Reserved blocks gid:      0 (group root)
+First inode:              11
+Inode size:	          128
+Journal inode:            8
+Default directory hash:   half_md4
+Directory Hash Seed:      4bb53823-173b-4b5d-a187-329ca43f9dba
+Journal backup:           inode blocks
+Checksum type:            crc32c
+Checksum:                 0x94546fe8
+root@parrot-virtual:~/lab6# losetup --detach /dev/loop0
+root@parrot-virtual:~/lab6# losetup --list
+root@parrot-virtual:~/lab6# 
+
